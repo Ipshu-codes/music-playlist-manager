@@ -16,3 +16,12 @@ class Playlist:
 
         for i, song in enumerate(self.songs, start=1):
             print(f"{i}. {song.title} - {song.artist}")
+
+    def remove_song(self, title):
+        for song in self.songs:
+            if song.title.lower() == title.lower():
+                self.songs.remove(song)
+                print(f"Removed: {song.title}")
+                return
+
+        print("Song not found")
