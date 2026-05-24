@@ -5,6 +5,20 @@ playlists = {}
 
 current_playlist = None
 
+def save_playlists(playlists):
+    with open("playlists.txt", "w") as file:
+
+        for playlist_name, playlist in playlists.items():
+
+            file.write(f"Playlist: {playlist_name}\n")
+
+            for song in playlist.songs:
+                file.write(f"{song.title} - {song.artist}\n")
+
+            file.write("\n")
+
+    print("All playlists saved successfully!")
+
 while True:
     print("\n--- PLAYLIST MANAGER ---")
     print("1. Create Playlist")
