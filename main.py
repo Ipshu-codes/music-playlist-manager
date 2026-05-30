@@ -2,6 +2,7 @@ from song import Song
 from playlist import Playlist
 import random
 import os
+import json
 
 playlists = {}
 
@@ -10,55 +11,54 @@ current_playlist = None
 
 
 def save_playlists(playlists):
-    with open("playlists.txt", "w") as file:
 
-        for playlist_name, playlist in playlists.items():
+    data = {}
 
-            file.write(f"Playlist:{playlist_name}\n")
+    for playlist_name, playlist in playlists.items():
 
-            for song in playlist.songs:
-                file.write(f"{song.title}|{song.artist}\n")
+        data[playlist_name] = []
 
-            file.write("\n")
+        for song in playlist.songs:
 
-    print("All playlists saved successfully!")
+            data[playlist_name].append({
+                "title": song.title,
+                "artist": song.artist
+            })
 
+    with open("playlists.json", "w") as file:
+        json.dump(data, file, indent=4)
+
+    print("Playlists saved successfully!")
 
 
 def load_playlists():
+
     playlists = {}
 
-    if not os.path.exists("playlists.txt"):
-        return playlists
+    try:
+        with open("playlists.json", "r") as file:
 
-    current_playlist = None
+            data = json.load(file)
 
-    with open("playlists.txt", "r") as file:
+            for playlist_name, songs in data.items():
 
-        for line in file:
+                playlist = Playlist(playlist_name)
 
-            line = line.strip()
+                for song_data in songs:
 
-            if not line:
-                continue
+                    song = Song(
+                        song_data["title"],
+                        song_data["artist"]
+                    )
 
-            if line.startswith("Playlist:"):
+                    playlist.add_song(song)
 
-                playlist_name = line.replace("Playlist:", "")
+                playlists[playlist_name] = playlist
 
-                current_playlist = Playlist(playlist_name)
-
-                playlists[playlist_name] = current_playlist
-
-            else:
-                title, artist = line.split("|")
-
-                song = Song(title, artist)
-
-                current_playlist.add_song(song)
+    except FileNotFoundError:
+        pass
 
     return playlists
-
 
 
 playlists = load_playlists()
